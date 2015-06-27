@@ -46,7 +46,7 @@ describe('gitane', function() {
         expect(file).to.be.a('string')
         expect(file).to.match(/_gitane/)
         var data = fs.readFileSync(file, 'utf8')
-        expect(data).to.match(/exec ssh -i/)
+        expect(data).to.match(/ssh -i/)
 
         var key = fs.readFileSync(keyfile, 'utf8')
         expect(key).to.eql('testkey')
@@ -65,7 +65,7 @@ describe('gitane', function() {
         expect(file).to.eql(filename)
         expect(err).to.be.null
         var data = fs.readFileSync(file, 'utf8')
-        expect(data).to.match(/exec ssh -i/)
+        expect(data).to.match(/ssh -i/)
         var key = fs.readFileSync(keyfile, 'utf8')
         expect(key).to.eql('testkey')
 

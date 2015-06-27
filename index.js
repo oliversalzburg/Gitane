@@ -14,7 +14,7 @@ var emitter
 
 // Template string for wrapper script.
 var GIT_SSH_TEMPLATE = '#!/bin/sh\n' +
-'exec ssh -i $key -o StrictHostKeyChecking=no "$@"\n'
+'ssh -i $key -o StrictHostKeyChecking=no "$@"\n'
 
 function mkTempFile(prefix, suffix) {
     var randomStr = crypto.randomBytes(4).toString('hex')

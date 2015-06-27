@@ -87,14 +87,20 @@ describe('gitane', function() {
         var stats = fs.statSync(file)
 
         // Note we must convert to octal ourselves.
-        expect(stats.mode.toString(8)).to.eql('100755')
+	if (process.platform == 'win32') {
+		expect(stats.mode.toString(8)).to.eql('100666');
+	} else {
+		expect(stats.mode.toString(8)).to.eql('100755')
+	}
 
         fs.unlinkSync(file)
 
         var stats = fs.statSync(keyfile)
-
-        // Note we must convert to octal ourselves.
-        expect(stats.mode.toString(8)).to.eql('100600')
+	if (process.platform == 'win32') {
+		expect(stats.mode.toString(8)).to.eql('100666');
+	} else {
+		expect(stats.mode.toString(8)).to.eql('100755')
+	}
 
         fs.unlinkSync(keyfile)
 
@@ -113,16 +119,20 @@ describe('gitane', function() {
         var stats = fs.statSync(file)
 
         // Note we must convert to octal ourselves.
-        expect(stats.mode.toString(8)).to.eql('100755')
+	if (process.platform == 'win32') {
+		expect(stats.mode.toString(8)).to.eql('100666');
+	} else {
+		expect(stats.mode.toString(8)).to.eql('100755')
+	}
 
         fs.unlinkSync(file)
 
         var stats = fs.statSync(keyfile)
-
-        // Note we must convert to octal ourselves.
-        expect(stats.mode.toString(8)).to.eql('100744')
-
-        fs.unlinkSync(keyfile)
+	if (process.platform == 'win32') {
+		expect(stats.mode.toString(8)).to.eql('100666');
+	} else {
+		expect(stats.mode.toString(8)).to.eql('100744')
+	}
 
         done()
       })

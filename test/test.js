@@ -138,21 +138,19 @@ describe('gitane', function() {
 
     it('should support event emitter parameter for real-time updates', function(done) {
       var testkey = 'testkey'
+      var echoMessage = 'hello'
       var gotStdout = false
       function mockEmit(ev, data) {
         if (ev === 'stdout') {
             gotStdout = true
-            expect(fs.realpathSync(data.trim())).to.eql(fs.realpathSync(os.tmpDir()))
+            expect(data.trim()).to.eql(echoMessage)
         }
       }
-      var opts = {emitter: {emit:mockEmit}, baseDir:os.tmpDir(), privKey: testkey, cmd:'env'}
+
+      var opts = { emitter: { emit: mockEmit }, baseDir: os.tmpDir(), privkey: testkey, cmd: 'echo ' + echoMessage}
       gitane.run(opts, function(err, stdout, stderr) {
         expect(err).to.be.null
-console.log('lllllll')
-console.log(stdout.trim())
-console.log(stderr.trim())
-console.log(fs.realpathSync(stdout.trim()))
-        expect(fs.realpathSync(stdout.trim())).to.eql(fs.realpathSync(os.tmpDir()))
+        expect(stdout.trim()).to.eql(echoMessage)
         expect(gotStdout).to.be.true
         done()
       })

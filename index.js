@@ -129,7 +129,6 @@ function run(baseDir, privKey, cmd, keyMode, cb) {
         if (typeof(emitter) === 'object') {
           emitter.emit('stdout', buf)
         }
-        console.log(buf)
         proc.stdoutBuffer += buf
       })
 
@@ -137,7 +136,6 @@ function run(baseDir, privKey, cmd, keyMode, cb) {
         if (typeof(emitter) === 'object') {
           emitter.emit('stderr', buf)
         }
-        console.log(buf)
         proc.stderrBuffer += buf
       })
 

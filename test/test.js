@@ -10,7 +10,7 @@ describe('gitane', function() {
     it('should run the command with correct GIT_SSH environment', function(done) {
       var testkey = 'testkey'
 
-      gitane.run({baseDir: process.cwd(), detached: false, priKey: testkey, cmd: 'env'}, function(err, stdout, stderr) {
+      gitane.run(process.cwd(), testkey, 'env', function(err, stdout, stderr) {
         expect(err).to.be.null
         expect(stdout).to.match(/GIT_SSH=.*_gitane.*\.sh/)
         done()
@@ -20,7 +20,7 @@ describe('gitane', function() {
     it('should run the command in the correct baseDir', function(done) {
       var testkey = 'testkey'
 
-      gitane.run({baseDir: os.tmpDir(), detached: true, priKey: testkey, cmd: 'pwd'}, function(err, stdout, stderr) {
+      gitane.run(os.tmpDir(), testkey, 'pwd', function(err, stdout, stderr) {
         expect(err).to.be.null
         expect(fs.realpathSync(stdout.trim())).to.eql(fs.realpathSync(os.tmpDir()))
         done()
@@ -145,11 +145,13 @@ describe('gitane', function() {
             expect(fs.realpathSync(data.trim())).to.eql(fs.realpathSync(os.tmpDir()))
         }
       }
-      var opts = {emitter: {emit:mockEmit}, baseDir:os.tmpDir(), privKey: testkey, cmd:'whoami'}
+      var opts = {emitter: {emit:mockEmit}, baseDir:os.tmpDir(), privKey: testkey, cmd:'env'}
       gitane.run(opts, function(err, stdout, stderr) {
         expect(err).to.be.null
-        console.log(stdout.trim())
-        console.log(stderr.trim())
+console.log('lllllll')
+console.log(stdout.trim())
+console.log(stderr.trim())
+console.log(fs.realpathSync(stdout.trim()))
         expect(fs.realpathSync(stdout.trim())).to.eql(fs.realpathSync(os.tmpDir()))
         expect(gotStdout).to.be.true
         done()

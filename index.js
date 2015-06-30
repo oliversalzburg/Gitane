@@ -82,7 +82,7 @@ function writeFiles(privKey, file, keyMode, cb) {
 // spawned process should be detached from this one, and defaults to true.
 // Detachment means the git process won't hang trying to prompt for a password.
 function run(baseDir, privKey, cmd, keyMode, cb) {
-  var detached = true
+  var detached = isWindows ? false : true
   var spawnFn = spawn
   if (typeof(keyMode) === 'function') {
     cb = keyMode
@@ -129,6 +129,7 @@ function run(baseDir, privKey, cmd, keyMode, cb) {
         if (typeof(emitter) === 'object') {
           emitter.emit('stdout', buf)
         }
+        console.log(buf)
         proc.stdoutBuffer += buf
       })
 
@@ -136,6 +137,7 @@ function run(baseDir, privKey, cmd, keyMode, cb) {
         if (typeof(emitter) === 'object') {
           emitter.emit('stderr', buf)
         }
+        console.log(buf)
         proc.stderrBuffer += buf
       })
 

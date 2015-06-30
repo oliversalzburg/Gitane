@@ -96,7 +96,7 @@ describe('gitane', function() {
       	if (process.platform == 'win32') {
       		expect(stats.mode.toString(8)).to.eql('100666');
       	} else {
-      		expect(stats.mode.toString(8)).to.eql('100755')
+      		expect(stats.mode.toString(8)).to.eql('100600')
       	}
 
         fs.unlinkSync(file)

@@ -46,10 +46,11 @@ describe('gitane', function() {
         expect(file).to.be.a('string')
         expect(file).to.match(/_gitane/)
         var data = fs.readFileSync(file, 'utf8')
-        expect(data).to.match(/exec ssh -i/)
+        expect(data).to.match(/ssh -i/)
 
         var key = fs.readFileSync(keyfile, 'utf8')
         expect(key).to.eql('testkey')
+
         fs.unlinkSync(file)
         fs.unlinkSync(keyfile)
 
@@ -65,7 +66,7 @@ describe('gitane', function() {
         expect(file).to.eql(filename)
         expect(err).to.be.null
         var data = fs.readFileSync(file, 'utf8')
-        expect(data).to.match(/exec ssh -i/)
+        expect(data).to.match(/ssh -i/)
         var key = fs.readFileSync(keyfile, 'utf8')
         expect(key).to.eql('testkey')
 
@@ -85,17 +86,20 @@ describe('gitane', function() {
         expect(err).to.be.null
 
         var stats = fs.statSync(file)
-
-        // Note we must convert to octal ourselves.
-        expect(stats.mode.toString(8)).to.eql('100755')
-
-        fs.unlinkSync(file)
+      	if (process.platform == 'win32') {
+      		expect(stats.mode.toString(8)).to.eql('100666');
+      	} else {
+      		expect(stats.mode.toString(8)).to.eql('100755')
+      	}
 
         var stats = fs.statSync(keyfile)
+      	if (process.platform == 'win32') {
+      		expect(stats.mode.toString(8)).to.eql('100666');
+      	} else {
+      		expect(stats.mode.toString(8)).to.eql('100600')
+      	}
 
-        // Note we must convert to octal ourselves.
-        expect(stats.mode.toString(8)).to.eql('100600')
-
+        fs.unlinkSync(file)
         fs.unlinkSync(keyfile)
 
         done()
@@ -111,17 +115,20 @@ describe('gitane', function() {
         expect(err).to.be.null
 
         var stats = fs.statSync(file)
-
-        // Note we must convert to octal ourselves.
-        expect(stats.mode.toString(8)).to.eql('100755')
-
-        fs.unlinkSync(file)
+      	if (process.platform == 'win32') {
+      		expect(stats.mode.toString(8)).to.eql('100666');
+      	} else {
+      		expect(stats.mode.toString(8)).to.eql('100755')
+      	}
 
         var stats = fs.statSync(keyfile)
+      	if (process.platform == 'win32') {
+      		expect(stats.mode.toString(8)).to.eql('100666');
+      	} else {
+      		expect(stats.mode.toString(8)).to.eql('100744')
+      	}
 
-        // Note we must convert to octal ourselves.
-        expect(stats.mode.toString(8)).to.eql('100744')
-
+        fs.unlinkSync(file)
         fs.unlinkSync(keyfile)
 
         done()
@@ -131,18 +138,19 @@ describe('gitane', function() {
 
     it('should support event emitter parameter for real-time updates', function(done) {
       var testkey = 'testkey'
+      var echoMessage = 'hello'
       var gotStdout = false
       function mockEmit(ev, data) {
-        console.log("emitter")
         if (ev === 'stdout') {
             gotStdout = true
-            expect(fs.realpathSync(data.trim())).to.eql(fs.realpathSync(os.tmpDir()))
+            expect(data.trim()).to.eql(echoMessage)
         }
       }
-      var opts = {emitter: {emit:mockEmit}, baseDir:os.tmpDir(), privKey: testkey, cmd:'pwd'}
+
+      var opts = { emitter: { emit: mockEmit }, baseDir: os.tmpDir(), privkey: testkey, cmd: 'echo ' + echoMessage}
       gitane.run(opts, function(err, stdout, stderr) {
         expect(err).to.be.null
-        expect(fs.realpathSync(stdout.trim())).to.eql(fs.realpathSync(os.tmpDir()))
+        expect(stdout.trim()).to.eql(echoMessage)
         expect(gotStdout).to.be.true
         done()
       })

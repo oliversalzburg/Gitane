@@ -3,18 +3,18 @@ var EventEmitter = require('events').EventEmitter
 var fs = require('fs')
 var path = require('path')
 var os = require('os')
-var spawn = require('child_process').spawn
+var spawn = require('cross-spawn')
 var Step = require('step')
 
 var isWindows = /^win/.test(process.platform)
-var PATH = isWindows ? process.env.Path : process.env.PATH;
-var SEPARATOR = isWindows ? ';' : ':';
+var PATH = isWindows ? process.env.Path : process.env.PATH
+var SEPARATOR = isWindows ? ';' : ':'
 
 var emitter
 
 // Template string for wrapper script.
-var GIT_SSH_TEMPLATE = '#!/bin/sh\n' +
-'ssh -i $key -o StrictHostKeyChecking=no "$@"\n'
+var GIT_SSH_TEMPLATE = "#!/bin/sh\n" +
+"ssh -i $key -o StrictHostKeyChecking=no '$@'\n"
 
 function mkTempFile(prefix, suffix) {
     var randomStr = crypto.randomBytes(4).toString('hex')
@@ -54,28 +54,16 @@ function writeFiles(privKey, file, keyMode, cb) {
   }
 
   var data = GIT_SSH_TEMPLATE.replace('$key', keyfileName)
-  Step(
-    function() {
-      fs.writeFile(file, data, this.parallel())
-      fs.writeFile(keyfile, privKey, this.parallel())
-    },
-    function(err) {
-      if (err) {
-        return cb(err, null)
-      }
-      // make script executable
-      fs.chmod(file, 0755, this.parallel())
-      // make key secret
-      fs.chmod(keyfile, keyMode, this.parallel())
-    },
-    function(err) {
-      if (err) {
-        return cb(err, null)
-      }
 
-      return cb(null, file, keyfile)
-    }
-  )
+  try {
+    fs.writeFileSync(file, data, { mode: 0755 })
+    fs.writeFileSync(keyfile, privKey, { mode: keyMode })
+  } catch(e) {
+    console.log(e);
+    return cb(e);
+  }
+
+  return cb(null, file, keyfile)
 }
 
 //
@@ -116,7 +104,7 @@ function run(baseDir, privKey, cmd, keyMode, cb) {
   }
 
   var split = cmd.split(/\s+/)
-  var cmd = split[0]
+  cmd = split[0]
   var args = split.slice(1)
 
   Step(
@@ -130,7 +118,8 @@ function run(baseDir, privKey, cmd, keyMode, cb) {
       }
       this.file = file
       this.keyfile = keyfile
-      var proc = spawnFn(cmd, args, {cwd: baseDir, env: {GIT_SSH: file, PATH:PATH}, detached: detached})
+
+      var proc = spawnFn(cmd, args, {cwd: baseDir, detached: detached, env: {GIT_SSH: file, PATH:PATH}})
       proc.stdoutBuffer = ""
       proc.stderrBuffer = ""
       proc.stdout.setEncoding('utf8')
